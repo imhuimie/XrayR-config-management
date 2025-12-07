@@ -1,0 +1,165 @@
+# XrayR 配置文件示例
+# 此文件展示了生成器输出的配置格式
+
+Log:
+  Level: warning  # 日志级别: none, error, warning, info, debug
+
+ConnectionConfig:
+  Handshake: 4        # 握手时间限制（秒）
+  ConnIdle: 30        # 连接空闲超时（秒）
+  UplinkOnly: 2       # 上行专用时间（秒）
+  DownlinkOnly: 4     # 下行专用时间（秒）
+  BufferSize: 64      # 缓冲区大小（KB）
+
+Nodes:
+  # ============================================
+  # Vless 节点示例（带 XTLS Vision）
+  # ============================================
+  - PanelType: "NewV2board"
+    ApiConfig:
+      ApiHost: "https://panel.example.com"  # 面板域名
+      ApiKey: "your-panel-api-key"          # 面板 API 密钥
+      NodeID: 528                            # 节点 ID（必须与面板中的节点ID一致）
+      NodeType: Vless                        # 节点类型
+      Timeout: 30                            # API 请求超时时间（秒）
+      VlessFlow: "xtls-rprx-vision"         # Vless 流控模式
+      SpeedLimit: 0                          # 速度限制（Mbps，0=不限速）
+      DeviceLimit: 0                         # 设备数限制（0=不限制）
+    ControllerConfig:
+      ListenIP: 0.0.0.0                     # 监听 IP
+      SendIP: 0.0.0.0                       # 发送 IP
+      UpdatePeriodic: 60                    # 更新周期（秒）
+      EnableDNS: false                      # 是否启用 DNS
+      DNSType: AsIs                         # DNS 类型
+      EnableProxyProtocol: false            # 是否启用 Proxy Protocol
+    CertConfig:
+      CertMode: file                        # 证书模式: file, dns, http, none
+      CertDomain: "node1.example.com"       # 证书域名
+      CertFile: /root/cert/fullchain.pem    # 证书文件路径
+      KeyFile: /root/cert/privkey.pem       # 密钥文件路径
+
+  # ============================================
+  # Vless 节点示例（无流控）
+  # ============================================
+  - PanelType: "NewV2board"
+    ApiConfig:
+      ApiHost: "https://panel.example.com"
+      ApiKey: "your-panel-api-key"
+      NodeID: 529
+      NodeType: Vless
+      Timeout: 30
+      VlessFlow: ""                         # 空字符串表示不使用流控
+      SpeedLimit: 100                       # 限速 100 Mbps
+      DeviceLimit: 3                        # 限制 3 个设备
+    ControllerConfig:
+      ListenIP: 0.0.0.0
+      SendIP: 0.0.0.0
+      UpdatePeriodic: 60
+      EnableDNS: false
+      DNSType: AsIs
+      EnableProxyProtocol: false
+    CertConfig:
+      CertMode: dns                         # DNS 验证自动申请证书
+      CertDomain: "node2.example.com"
+
+  # ============================================
+  # Shadowsocks 节点示例
+  # ============================================
+  - PanelType: "NewV2board"
+    ApiConfig:
+      ApiHost: "https://panel.example.com"
+      ApiKey: "your-panel-api-key"
+      NodeID: 527
+      NodeType: Shadowsocks
+      Timeout: 30
+      SpeedLimit: 0
+      DeviceLimit: 0
+    ControllerConfig:
+      ListenIP: 0.0.0.0
+      SendIP: 0.0.0.0
+      UpdatePeriodic: 60
+      EnableDNS: false
+      DNSType: AsIs
+      EnableProxyProtocol: false
+    # Shadowsocks 不需要证书配置
+
+  # ============================================
+  # Vmess 节点示例
+  # ============================================
+  - PanelType: "NewV2board"
+    ApiConfig:
+      ApiHost: "https://panel.example.com"
+      ApiKey: "your-panel-api-key"
+      NodeID: 530
+      NodeType: Vmess
+      Timeout: 30
+      SpeedLimit: 0
+      DeviceLimit: 0
+    ControllerConfig:
+      ListenIP: 0.0.0.0
+      SendIP: 0.0.0.0
+      UpdatePeriodic: 60
+      EnableDNS: false
+      DNSType: AsIs
+      EnableProxyProtocol: false
+    CertConfig:
+      CertMode: http                        # HTTP 验证自动申请证书
+      CertDomain: "node3.example.com"
+
+  # ============================================
+  # Trojan 节点示例
+  # ============================================
+  - PanelType: "NewV2board"
+    ApiConfig:
+      ApiHost: "https://panel.example.com"
+      ApiKey: "your-panel-api-key"
+      NodeID: 531
+      NodeType: Trojan
+      Timeout: 30
+      SpeedLimit: 0
+      DeviceLimit: 0
+    ControllerConfig:
+      ListenIP: 0.0.0.0
+      SendIP: 0.0.0.0
+      UpdatePeriodic: 60
+      EnableDNS: false
+      DNSType: AsIs
+      EnableProxyProtocol: false
+    CertConfig:
+      CertMode: file
+      CertDomain: "node4.example.com"
+      CertFile: /root/cert/fullchain.pem
+      KeyFile: /root/cert/privkey.pem
+
+# ============================================
+# 配置说明
+# ============================================
+#
+# 1. 节点类型 (NodeType):
+#    - Vless: 推荐使用，支持 XTLS
+#    - Vmess: 传统协议
+#    - Shadowsocks: 简单高效
+#    - Trojan: 伪装性好
+#
+# 2. 流控模式 (VlessFlow):
+#    - xtls-rprx-vision: 推荐，性能最好
+#    - xtls-rprx-direct: 直连模式
+#    - "": 不使用流控
+#
+# 3. 证书模式 (CertMode):
+#    - file: 使用已有证书文件
+#    - dns: DNS 验证自动申请（需要 DNS API）
+#    - http: HTTP 验证自动申请（需要 80 端口）
+#    - none: 不使用证书（不推荐）
+#
+# 4. 速度限制 (SpeedLimit):
+#    - 单位: Mbps
+#    - 0: 不限速
+#    - >0: 限制为指定速度
+#
+# 5. 设备限制 (DeviceLimit):
+#    - 0: 不限制设备数
+#    - >0: 限制同时在线设备数
+#
+# ============================================
+

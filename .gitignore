@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+data/
+*.log
+.DS_Store
+client/node_modules/
+client/dist/
+.serena/
+.spec-workflow/
+
